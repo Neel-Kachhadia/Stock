@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
         const results = await searchInstruments(query);
         return NextResponse.json(results);
     } catch (error) {
+        console.error('Search error:', error);
         return NextResponse.json({ error: 'Search failed' }, { status: 500 });
     }
 }

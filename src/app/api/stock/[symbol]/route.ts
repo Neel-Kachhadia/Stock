@@ -11,14 +11,15 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const symbol = rawSymbol.toUpperCase();
     const searchParams = request.nextUrl.searchParams;
     const interval = searchParams.get('interval') || 'ONE_DAY';
-    const range = searchParams.get('range') || '30';
+    const range = searchParams.get('range') || '365';
 
     try {
-        const smartApi = await getSmartApi();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const smartApi: any = await getSmartApi();
 
         const token = await getInstrumentToken(symbol, 'NSE');
         if (!token) {
-            return NextResponse.json({ error: 'Symbol not found' }, { status: 404 });
+            return NextResponse.json({ error: `Symbol '${symbol}' not found on NSE.` }, { status: 404 });
         }
 
         const toDate = new Date();
@@ -34,8 +35,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
             return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const response = await (smartApi as any).getCandleData({
+        const response = await smartApi.getCandleData({
             exchange: 'NSE',
             symboltoken: token,
             interval: interval,
@@ -44,9 +44,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
         });
 
         if (response.status && response.data) {
+            // Angel One returns: [timestamp, open, high, low, close, volume]
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const formattedData = response.data.map((item: any) => ({
-                time: item[0].split('T')[0],
+                time: item[0].split('T')[0], // YYYY-MM-DD
                 open: item[1],
                 high: item[2],
                 low: item[3],
@@ -56,12 +57,12 @@ export async function GET(request: NextRequest, context: RouteContext) {
             return NextResponse.json(formattedData);
         } else {
             return NextResponse.json(
-                { error: response.message || 'Data fetch failed' },
+                { error: response.message || 'Data fetch failed from Angel One.' },
                 { status: 500 }
             );
         }
     } catch (error: unknown) {
-        console.error('API Error:', error);
+        console.error('Angel One API Error:', error);
         const message = error instanceof Error ? error.message : 'Unknown error';
         return NextResponse.json({ error: message }, { status: 500 });
     }

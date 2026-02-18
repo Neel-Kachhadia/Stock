@@ -1,10 +1,15 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { createChart, ColorType } from 'lightweight-charts';
+import {
+    createChart,
+    ColorType,
+    CandlestickSeries,
+    LineSeries,
+} from 'lightweight-charts';
 import { calculateSMA, calculateEMA, calculateBollinger } from '@/lib/indicators';
 
-interface OHLCData {
+interface OHLCBar {
     time: string;
     open: number;
     high: number;
@@ -35,13 +40,12 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicatorSeriesRef = useRef<Map<string, any>>(new Map());
 
-    const [data, setData] = useState<OHLCData[]>([]);
+    const [data, setData] = useState<OHLCBar[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [activeTimeframe, setActiveTimeframe] = useState(TIMEFRAMES[3]);
     const [activeIndicators, setActiveIndicators] = useState<string[]>([]);
 
-    // Fetch OHLC data
     const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -52,12 +56,11 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
             const json = await res.json();
             if (res.ok && Array.isArray(json)) {
                 const sorted = [...json].sort(
-                    (a: OHLCData, b: OHLCData) =>
+                    (a: OHLCBar, b: OHLCBar) =>
                         new Date(a.time).getTime() - new Date(b.time).getTime()
                 );
-                // Deduplicate by time
                 const seen = new Set<string>();
-                const unique = sorted.filter((d: OHLCData) => {
+                const unique = sorted.filter((d: OHLCBar) => {
                     if (seen.has(d.time)) return false;
                     seen.add(d.time);
                     return true;
@@ -78,11 +81,10 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
         if (symbol) fetchData();
     }, [fetchData]);
 
-    // Initialize chart once
+    // Initialize chart once — lightweight-charts v5 API
     useEffect(() => {
         if (!chartContainerRef.current) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const chart = createChart(chartContainerRef.current, {
             layout: {
                 background: { type: ColorType.Solid, color: '#0b0e11' },
@@ -94,13 +96,16 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
             },
             width: chartContainerRef.current.clientWidth,
             height: chartContainerRef.current.clientHeight,
-            timeScale: { timeVisible: true, secondsVisible: false, borderColor: '#363a45' },
+            timeScale: {
+                timeVisible: true,
+                secondsVisible: false,
+                borderColor: '#363a45',
+            },
             rightPriceScale: { borderColor: '#363a45' },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        }) as any;
+        });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const candleSeries = (chart as any).addCandlestickSeries({
+        // v5: use chart.addSeries(CandlestickSeries, options)
+        const candleSeries = chart.addSeries(CandlestickSeries, {
             upColor: '#089981',
             downColor: '#f23645',
             borderVisible: false,
@@ -126,7 +131,7 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
         };
     }, []);
 
-    // Update candle data
+    // Update candle data when data changes
     useEffect(() => {
         if (candleSeriesRef.current && data.length > 0) {
             candleSeriesRef.current.setData(data);
@@ -134,7 +139,7 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
         }
     }, [data]);
 
-    // Update indicators
+    // Update indicators when data or activeIndicators change
     useEffect(() => {
         if (!chartRef.current || data.length === 0) return;
 
@@ -149,11 +154,11 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
         });
         indicatorSeriesRef.current.clear();
 
-        // Add active indicators
+        // Add active indicators using v5 API
         activeIndicators.forEach((ind) => {
             if (ind === 'SMA') {
                 const smaData = calculateSMA(data, 20);
-                const s = chartRef.current.addLineSeries({
+                const s = chartRef.current.addSeries(LineSeries, {
                     color: '#2962ff',
                     lineWidth: 2,
                     title: 'SMA 20',
@@ -164,7 +169,7 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
             }
             if (ind === 'EMA') {
                 const emaData = calculateEMA(data, 20);
-                const s = chartRef.current.addLineSeries({
+                const s = chartRef.current.addSeries(LineSeries, {
                     color: '#ff6d00',
                     lineWidth: 2,
                     title: 'EMA 20',
@@ -179,14 +184,14 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
                 const upper = bbData.map((d: any) => ({ time: d.time, value: d.upper }));
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const lower = bbData.map((d: any) => ({ time: d.time, value: d.lower }));
-                const uSeries = chartRef.current.addLineSeries({
-                    color: 'rgba(41,98,255,0.5)',
+                const uSeries = chartRef.current.addSeries(LineSeries, {
+                    color: 'rgba(41,98,255,0.6)',
                     lineWidth: 1,
                     title: 'BB Upper',
                     priceScaleId: 'right',
                 });
-                const lSeries = chartRef.current.addLineSeries({
-                    color: 'rgba(41,98,255,0.5)',
+                const lSeries = chartRef.current.addSeries(LineSeries, {
+                    color: 'rgba(41,98,255,0.6)',
                     lineWidth: 1,
                     title: 'BB Lower',
                     priceScaleId: 'right',
@@ -221,7 +226,6 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
             >
                 <span style={{ fontWeight: 700, fontSize: '1rem', marginRight: '0.5rem' }}>{symbol}</span>
 
-                {/* Timeframe buttons */}
                 {TIMEFRAMES.map((tf) => (
                     <button
                         key={tf.label}
@@ -243,7 +247,6 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
 
                 <div style={{ width: '1px', height: '20px', background: 'var(--border-color)', margin: '0 0.25rem' }} />
 
-                {/* Indicator buttons */}
                 {OVERLAY_INDICATORS.map((ind) => {
                     const isActive = activeIndicators.includes(ind);
                     return (
@@ -267,7 +270,7 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
 
                 {loading && (
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginLeft: 'auto' }}>
-                        Updating...
+                        Loading...
                     </span>
                 )}
             </div>
@@ -277,13 +280,9 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
                 {loading && data.length === 0 && (
                     <div
                         style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%,-50%)',
-                            zIndex: 10,
-                            color: 'var(--text-secondary)',
-                            fontSize: '0.9rem',
+                            position: 'absolute', top: '50%', left: '50%',
+                            transform: 'translate(-50%,-50%)', zIndex: 10,
+                            color: 'var(--text-secondary)', fontSize: '0.9rem',
                         }}
                     >
                         Loading {symbol}...
@@ -292,17 +291,13 @@ export default function ChartComponent({ symbol }: ChartComponentProps) {
                 {error && (
                     <div
                         style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%,-50%)',
-                            zIndex: 10,
-                            color: 'var(--down-color)',
-                            textAlign: 'center',
-                            padding: '1rem',
+                            position: 'absolute', top: '50%', left: '50%',
+                            transform: 'translate(-50%,-50%)', zIndex: 10,
+                            color: '#f23645', textAlign: 'center', padding: '1rem',
+                            maxWidth: '80%',
                         }}
                     >
-                        {error}
+                        ⚠️ {error}
                     </div>
                 )}
                 <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
