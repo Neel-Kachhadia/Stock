@@ -21,21 +21,23 @@ export const loadInstruments = async () => {
 };
 
 // In Angel One scrip master:
-//   item.name  = clean ticker (e.g. "MARUTI", "RELIANCE")
-//   item.symbol = exchange-specific code (e.g. "MARUTI-EQ", "RELIANCE-EQ")
-//   item.token  = numeric token used for data fetch
+//   item.name  = clean ticker (e.g. "RELIANCE")
+//   item.symbol = exchange code (e.g. "RELIANCE-EQ")
+//   item.token  = numeric token for data fetch
 //   item.exch_seg = "NSE" | "BSE" | "NFO" etc.
+//   item.instrumenttype = "" for NSE/BSE equity (NOT "EQ")
 
 export const getInstrumentToken = async (
     name: string,
     exchange = 'NSE'
 ): Promise<string | null> => {
     const instruments = await loadInstruments();
+    // NSE equity stocks have symbol like "RELIANCE-EQ" and instrumenttype = ""
     const instrument = instruments.find(
         (item: any) =>
             item.name === name &&
             item.exch_seg === exchange &&
-            item.instrumenttype === 'EQ' // equity only
+            item.symbol.endsWith('-EQ')
     );
     return instrument ? instrument.token : null;
 };
@@ -48,16 +50,14 @@ export const searchInstruments = async (query: string) => {
         .filter(
             (item: any) =>
                 (item.exch_seg === 'NSE' || item.exch_seg === 'BSE') &&
-                item.instrumenttype === 'EQ' &&
+                item.symbol.endsWith('-EQ') && // Equity only
                 (item.name.toLowerCase().includes(lower) ||
                     item.symbol.toLowerCase().includes(lower))
         )
         .slice(0, 12)
         .map((item: any) => ({
             token: item.token,
-            // Return `name` as the symbol — this is what we pass to the API route
-            symbol: item.name,
-            // Keep the full exchange symbol for display
+            symbol: item.name, // Return `name` (e.g. "RELIANCE") for API lookup
             tradingSymbol: item.symbol,
             name: item.name,
             exch_seg: item.exch_seg,
