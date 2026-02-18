@@ -16,8 +16,8 @@ export const getSmartApi = async () => {
         throw new Error('Angel One credentials missing in Vercel env');
     }
 
-    // ✅ Prevent clock drift issues
-    authenticator.options = { window: 1 };
+    // ✅ CORRECT FOR OTLIB v13+
+    authenticator.setOptions({ window: 1 });
 
     const totp = authenticator.generate(TOTP_KEY);
 
