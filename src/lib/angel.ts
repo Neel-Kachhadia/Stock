@@ -1,4 +1,4 @@
-import { authenticator } from 'otplib';
+import { TOTP, NobleCryptoPlugin, ScureBase32Plugin } from 'otplib';
 
 const API_KEY = process.env.NEXT_PUBLIC_ANGEL_API_KEY;
 const CLIENT_CODE = process.env.ANGEL_CLIENT_CODE;
@@ -16,10 +16,13 @@ export const getSmartApi = async () => {
         throw new Error('Angel One credentials missing in Vercel env');
     }
 
-    // ✅ CORRECT FOR OTLIB v13+
-    authenticator.setOptions({ window: 1 });
+    // ✅ otplib v13+ requires explicit plugin setup
+    const totpInstance = new TOTP({
+        crypto: NobleCryptoPlugin,
+        base32: ScureBase32Plugin,
+    });
 
-    const totp = authenticator.generate(TOTP_KEY);
+    const totp = totpInstance.generate(TOTP_KEY);
 
     const smart_api = new SmartAPI({
         api_key: API_KEY,
