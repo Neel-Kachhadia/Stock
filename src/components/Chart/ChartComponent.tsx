@@ -9,6 +9,7 @@ import {
 } from 'lightweight-charts';
 import { calculateSMA, calculateEMA, calculateBollinger } from '@/lib/indicators';
 
+
 interface OHLCBar {
     time: string;
     open: number;
@@ -33,11 +34,8 @@ const OVERLAY_INDICATORS = ['SMA', 'EMA', 'Bollinger'];
 
 export default function ChartComponent({ symbol }: ChartComponentProps) {
     const chartContainerRef = useRef<HTMLDivElement>(null);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const chartRef = useRef<any>(null);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const candleSeriesRef = useRef<any>(null);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicatorSeriesRef = useRef<Map<string, any>>(new Map());
 
     const [data, setData] = useState<OHLCBar[]>([]);
