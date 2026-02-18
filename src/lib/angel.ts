@@ -1,6 +1,3 @@
-import { SmartAPI } from 'smartapi-javascript';
-import { authenticator } from 'otplib';
-
 const API_KEY = process.env.NEXT_PUBLIC_ANGEL_API_KEY;
 const CLIENT_CODE = process.env.ANGEL_CLIENT_CODE;
 const CLIENT_PIN = process.env.ANGEL_CLIENT_PIN;
@@ -10,6 +7,9 @@ let smartApiInstance: any = null;
 
 export const getSmartApi = async () => {
     if (smartApiInstance) return smartApiInstance;
+
+    const { SmartAPI } = await import('smartapi-javascript');
+    const { authenticator } = await import('otplib');
 
     const smart_api = new SmartAPI({
         api_key: API_KEY,
