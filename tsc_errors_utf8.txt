@@ -1,0 +1,24 @@
+﻿.next/dev/types/validator.ts(72,31): error TS2344: Type 'typeof import("D:/coding/src/app/api/stock/[symbol]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/stock/[symbol]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { symbol: string; }; }) => Promise<NextResponse<any>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ symbol: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ symbol: string; }>; }' is not assignable to type '{ params: { symbol: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'symbol' is missing in type 'Promise<{ symbol: string; }>' but required in type '{ symbol: string; }'.
+.next/types/validator.ts(72,31): error TS2344: Type 'typeof import("D:/coding/src/app/api/stock/[symbol]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/stock/[symbol]">'.
+  Types of property 'GET' are incompatible.
+    Type '(request: NextRequest, { params }: { params: { symbol: string; }; }) => Promise<NextResponse<any>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ symbol: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ symbol: string; }>; }' is not assignable to type '{ params: { symbol: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'symbol' is missing in type 'Promise<{ symbol: string; }>' but required in type '{ symbol: string; }'.
+src/lib/indicators.ts(16,21): error TS7006: Parameter 'value' implicitly has an 'any' type.
+src/lib/indicators.ts(16,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/lib/indicators.ts(27,21): error TS7006: Parameter 'value' implicitly has an 'any' type.
+src/lib/indicators.ts(27,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/lib/indicators.ts(38,21): error TS7006: Parameter 'value' implicitly has an 'any' type.
+src/lib/indicators.ts(38,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/lib/indicators.ts(57,22): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/lib/indicators.ts(57,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/lib/indicators.ts(68,20): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/lib/indicators.ts(68,26): error TS7006: Parameter 'index' implicitly has an 'any' type.

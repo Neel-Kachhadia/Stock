@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['smartapi-javascript', 'otplib', 'technicalindicators'],
+  // Mark server-only packages as external so Next.js doesn't bundle them
+  serverExternalPackages: ['smartapi-javascript', 'otplib', 'ws', 'axios'],
+  // Transpile client-side indicator library
+  transpilePackages: ['technicalindicators'],
 };
 
 export default nextConfig;

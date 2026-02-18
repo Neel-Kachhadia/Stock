@@ -1,0 +1,70 @@
+﻿
+> coding@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 878.7ms
+  Running TypeScript ...
+node.exe : Failed to 
+compile.
+At line:1 char:1
++ & "C:\Program Files
+\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (Failed    
+ to compile.:Stri    
+ng) [], RemoteEx    
+ception
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+
+./src/lib/indicators.
+ts:16:21
+Type error: 
+Parameter 'value' 
+implicitly has an 
+'any' type.
+
+[0m [90m 14 |[39m
+ [90m 15 |[39m     
+[36mconst[39m diff 
+[33m=[39m data[33m
+.[39mlength 
+[33m-[39m sma[33m.
+[39mlength[33m;[39
+m
+[31m[1m>[22m[39m
+[90m 16 |[39m     
+[36mreturn[39m sma
+[33m.[39mmap((value
+[33m,[39m index) 
+[33m=>[39m ({
+ [90m    |[39m     
+                
+[31m[1m^[22m[39m
+ [90m 17 |[39m     
+    time[33m:[39m 
+data[index 
+[33m+[39m diff][33
+m.[39mtime[33m,[39
+m
+ [90m 18 |[39m     
+    value[33m,[39m
+ [90m 19 |[39m     
+}))[33m;[39m[0m
+Next.js build worker 
+exited with code: 1 
+and signal: null
