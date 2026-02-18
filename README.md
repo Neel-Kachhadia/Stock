@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stock Analysis App - Indian Market
 
-## Getting Started
+A modern stock analysis web application for NSE/BSE markets.
 
-First, run the development server:
+## Features
+- Real-time OHLC candlestick charts (Angel One SmartAPI)
+- Technical indicators: SMA, EMA, Bollinger Bands
+- Timeframes: 1D, 1W, 1M, 1Y
+- Stock symbol search (NSE/BSE)
+- Dark theme, responsive UI
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Setup
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Copy `.env.local.example` to `.env.local` and fill in your Angel One credentials
+4. Run development server: `npm run dev`
+
+## Environment Variables
+
+```
+NEXT_PUBLIC_ANGEL_API_KEY=your_api_key
+ANGEL_CLIENT_CODE=your_client_code
+ANGEL_CLIENT_PIN=your_pin
+ANGEL_TOTP_KEY=your_totp_secret
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy to Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Set the environment variables in your Vercel project settings.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech Stack
+- Next.js 16 (App Router)
+- Lightweight Charts (TradingView)
+- TechnicalIndicators.js
+- Angel One SmartAPI
