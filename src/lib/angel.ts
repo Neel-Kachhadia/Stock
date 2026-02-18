@@ -1,3 +1,5 @@
+import { authenticator } from 'otplib';
+
 const API_KEY = process.env.NEXT_PUBLIC_ANGEL_API_KEY;
 const CLIENT_CODE = process.env.ANGEL_CLIENT_CODE;
 const CLIENT_PIN = process.env.ANGEL_CLIENT_PIN;
@@ -9,26 +11,33 @@ export const getSmartApi = async () => {
     if (smartApiInstance) return smartApiInstance;
 
     const { SmartAPI } = await import('smartapi-javascript');
-    const { authenticator } = await import('otplib');
+
+    if (!CLIENT_CODE || !CLIENT_PIN || !TOTP_KEY) {
+        throw new Error('Angel One credentials missing in Vercel env');
+    }
+
+    // ✅ Prevent clock drift issues
+    authenticator.options = { window: 1 };
+
+    const totp = authenticator.generate(TOTP_KEY);
 
     const smart_api = new SmartAPI({
         api_key: API_KEY,
     });
 
-    if (!CLIENT_CODE || !CLIENT_PIN || !TOTP_KEY) {
-        throw new Error('Angel One credentials missing in .env.local');
-    }
-
-    const totp = authenticator.generate(TOTP_KEY);
-
     try {
-        const data = await smart_api.generateSession(CLIENT_CODE, CLIENT_PIN, totp);
+        const data = await smart_api.generateSession(
+            CLIENT_CODE,
+            CLIENT_PIN,
+            totp
+        );
+
         if (data.status) {
             smartApiInstance = smart_api;
             return smartApiInstance;
-        } else {
-            throw new Error(data.message || 'Login failed');
         }
+
+        throw new Error(data.message || 'Login failed');
     } catch (error) {
         console.error('Angel One Login Error:', error);
         throw error;
